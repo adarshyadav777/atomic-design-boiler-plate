@@ -19,7 +19,7 @@
 #       - run: npm run format
 #       - run: npm run lint
 #       - run: npm test -- --watchAll=false
-      
+
 
 #   build-and-push:
 #     needs: ci
@@ -46,88 +46,6 @@
 #           tags: ${{ steps.meta.outputs.tags }}
 #           labels: ${{ steps.meta.outputs.labels }}
 
-
-
-# name: CI / Docker Build & Push / Deploy
-
-# on:
-#   push:
-#     branches: [ main ]
-#   pull_request:
-#     branches: [ main ]
-
-# jobs:
-#   ci:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v5
-#       - uses: actions/setup-node@v5
-#         with:
-#           node-version: 18
-#           cache: npm
-#       - run: npm ci
-#       - run: npm run format
-#       - run: npm run lint
-#       - run: npm test -- --watchAll=false
-
-#   build-and-push:
-#     needs: ci
-#     runs-on: ubuntu-latest
-#     if: github.event_name != 'pull_request'
-#     steps:
-#       - uses: actions/checkout@v5
-#       - uses: docker/setup-qemu-action@v3
-#       - uses: docker/setup-buildx-action@v3
-
-#       - uses: docker/login-action@v3
-#         with:
-#           username: ${{ secrets.DOCKER_USERNAME }}
-#           password: ${{ secrets.DOCKER_PASSWORD }}
-
-#       - id: meta
-#         uses: docker/metadata-action@v5
-#         with:
-#           images: ${{ secrets.DOCKER_USERNAME }}/react-app
-
-#       - uses: docker/build-push-action@v6
-#         with:
-#           context: .
-#           file: ./Dockerfile
-#           push: true
-#           platforms: linux/amd64,linux/arm64
-#           tags: ${{ steps.meta.outputs.tags }}
-#           labels: ${{ steps.meta.outputs.labels }}
-
-#   deploy:
-#     needs: build-and-push
-#     runs-on: ubuntu-latest
-#     if: github.ref == 'refs/heads/main'
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v5
-
-#       # Copy docker-compose.yml to server
-#       - name: Copy docker-compose to server
-#         uses: appleboy/scp-action@v0.1.6
-#         with:
-#           host: ${{ secrets.SERVER_IP }}
-#           username: ${{ secrets.SERVER_USER }}
-#           key: ${{ secrets.SERVER_SSH_KEY }}
-#           source: "docker-compose.yml"
-#           target: "~/app/"
-
-#       # Restart container on server
-#       - name: Deploy on Server via SSH
-#         uses: appleboy/ssh-action@v0.1.5
-#         with:
-#           host: ${{ secrets.SERVER_IP }}
-#           username: ${{ secrets.SERVER_USER }}
-#           key: ${{ secrets.SERVER_SSH_KEY }}
-#           script: |
-#             cd ~/app
-#             docker-compose pull
-#             docker-compose down
-#             docker-compose up -d
 
 
 name: CI / Docker Build & Push / Deploy
@@ -139,10 +57,6 @@ on:
     branches: [ main ]
 
 jobs:
-
-  # ---------------------------- #
-  # ✅ CI Job (Lint / Test)
-  # ---------------------------- #
   ci:
     runs-on: ubuntu-latest
     steps:
@@ -156,9 +70,6 @@ jobs:
       - run: npm run lint
       - run: npm test -- --watchAll=false
 
-  # ---------------------------- #
-  # ✅ Docker Build & Push Job
-  # ---------------------------- #
   build-and-push:
     needs: ci
     runs-on: ubuntu-latest
@@ -183,48 +94,38 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          platforms: linux/amd64, linux/arm64
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  # ---------------------------- #
-  # ✅ Deploy Job
-  # ---------------------------- #
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
-      # ✅ Copy docker-compose.yml to server
+      # Copy docker-compose.yml to server
       - name: Copy docker-compose to server
         uses: appleboy/scp-action@v0.1.6
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          passphrase: ${{ secrets.SERVER_SSH_PASSPHRASE }}
-          port: 22
           source: "docker-compose.yml"
-          target: "/home/${{ secrets.SERVER_USER }}/app/"
-          overwrite: true
+          target: "~/app/"
 
-      # ✅ Deploy on server with SSH
+      # Restart container on server
       - name: Deploy on Server via SSH
         uses: appleboy/ssh-action@v0.1.5
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          passphrase: ${{ secrets.SERVER_SSH_PASSPHRASE }}
-          port: 22
           script: |
-            cd /home/${{ secrets.SERVER_USER }}/app
+            cd ~/app
             docker-compose pull
             docker-compose down
             docker-compose up -d
-
-
+ 
