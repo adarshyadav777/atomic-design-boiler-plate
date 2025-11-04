@@ -30,7 +30,7 @@ const Project = () => {
   };
 
   const filteredData: Post[] =
-    data?.filter((project) =>
+    data?.filter((project1) =>
       project.title.toLowerCase().includes(searchQuery.toLowerCase())
     ) || [];
 
