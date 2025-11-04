@@ -34,12 +34,10 @@ jobs:
   deploy:
     needs: ci
     runs-on: self-hosted
-
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
-      
 
       - name: Deploy using Docker Compose (Fresh)
         run: |
@@ -70,5 +68,4 @@ jobs:
           docker-compose up -d
 
           echo "✅ Fresh deployment completed successfully!"
-
  
