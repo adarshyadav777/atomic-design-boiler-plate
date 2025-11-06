@@ -21,7 +21,7 @@ services:
       - jsonserver
 
   jsonserver:
-    image: node:18
+    image: node:20
     container_name: json-server-container
     working_dir: /app
     volumes:
