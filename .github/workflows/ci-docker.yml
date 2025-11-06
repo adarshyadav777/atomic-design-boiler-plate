@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: 18
+          node-version: 20
           #cache: npm
 
       - name: Install dependencies
@@ -42,30 +42,29 @@ jobs:
       - name: Deploy using Docker Compose (Fresh)
         run: |
           set -e
-          echo "🚀 Starting fresh deployment..."
+          echo "Starting fresh deployment..."
 
           # Ensure deployment directory exists
           cd ~/app || mkdir -p ~/app && cd ~/app
 
           # Sync project files from repo
-          echo "📦 Copying updated project files..."
+          echo "Copying updated project files..."
           rsync -a --delete $GITHUB_WORKSPACE/ ~/app/
 
           # Stop and remove old containers, volumes, and networks
-          echo "🛑 Stopping and removing old containers..."
+          echo "Stopping and removing old containers..."
           docker-compose down -v --remove-orphans
 
           # Optional: remove dangling images to avoid conflicts
-          echo "🗑️ Removing dangling Docker images..."
+          echo "Removing dangling Docker images..."
           docker image prune -f
 
           # Build fresh Docker images
-          echo "📦 Building Docker images..."
+          echo "Building Docker images..."
           docker-compose build --no-cache
 
           # Start containers fresh
-          echo "♻️ Starting containers..."
+          echo "Starting containers..."
           docker-compose up -d
 
-          echo "✅ Fresh deployment completed successfully!"
- 
+          echo "Fresh deployment completed successfully!"
