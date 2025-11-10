@@ -31,6 +31,12 @@ jobs:
       - name: Run tests
         run: npm test -- --watchAll=false
 
+      - name: Install Snyk
+        run: npm install -g snyk
+
+      - name: Run Snyk test
+        run: snyk test
+
   deploy:
     needs: ci
     runs-on: self-hosted
