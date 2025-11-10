@@ -40,7 +40,7 @@ const Project = () => {
         <div>Loading...</div>
       ) : (
         <ProjectTemplate
-          title={t('project1')}
+          title={t('project')}
           onAddClick={handleAddClick}
           searchTerm={searchTerm}
           onSearchChange={(e) => setSearchTerm(e.target.value)}
