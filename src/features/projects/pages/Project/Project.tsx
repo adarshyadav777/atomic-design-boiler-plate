@@ -52,7 +52,7 @@ const Project = () => {
           // projects={filteredData}
           projects={filteredData.map((p) => ({
             ...p,
-            id: Number(p.id), // ✅ Convert id to number
+            id: Number(p.id),
           }))}
           onEdit={handleEditClick}
           onDelete={handleDelete}
